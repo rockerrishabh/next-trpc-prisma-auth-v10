@@ -102,8 +102,8 @@ export const postRouter = t.router({
   add: t.procedure
     .input(
       z.object({
-        title: z.string().min(1).max(32),
-        slug: z.string().min(1).max(20),
+        title: z.string().min(1),
+        slug: z.string().min(1),
         content: z.string().min(1),
       })
     )
