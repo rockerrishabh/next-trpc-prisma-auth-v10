@@ -121,6 +121,12 @@ export const postRouter = t.router({
         },
         select: defaultPostSelect,
       });
+      if (!post) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `No post`,
+        });
+      }
       return post;
     }),
 });

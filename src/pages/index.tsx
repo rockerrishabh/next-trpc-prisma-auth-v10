@@ -32,7 +32,7 @@ const Home: NextPage = () => {
     },
   });
 
-  const onSubmit = handleSubmit(async (data) => {
+  const onSubmit = handleSubmit((data) => {
     toast.promise(addPost.mutateAsync(data), {
       loading: "Saving...",
       success: <b>Post saved!</b>,
