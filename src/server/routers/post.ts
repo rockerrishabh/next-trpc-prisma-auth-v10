@@ -6,7 +6,7 @@ import { t } from "../trpc";
 import { Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { client } from "../../lib/prisma";
+import { contextProps } from "@trpc/react/dist/internals/context";
 
 /**
  * Default selector for Post.
@@ -30,7 +30,7 @@ export const postRouter = t.router({
         cursor: z.string().nullish(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       /**
        * For pagination docs you can have a look here
        * @see https://trpc.io/docs/useInfiniteQuery
@@ -40,7 +40,7 @@ export const postRouter = t.router({
       const limit = input.limit ?? 50;
       const { cursor } = input;
 
-      const items = await client.post.findMany({
+      const items = await ctx.prisma.post.findMany({
         select: defaultPostSelect,
         // get an extra item at the end which we'll use as next cursor
         take: limit + 1,
@@ -67,8 +67,8 @@ export const postRouter = t.router({
         nextCursor,
       };
     }),
-  posts: t.procedure.query(async () => {
-    const posts = await client.post.findMany({
+  posts: t.procedure.query(async ({ ctx }) => {
+    const posts = await ctx.prisma.post.findMany({
       select: defaultPostSelect,
     });
     if (!posts) {
@@ -85,9 +85,9 @@ export const postRouter = t.router({
         id: z.string(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { id } = input;
-      const post = await client.post.findUnique({
+      const post = await ctx.prisma.post.findUnique({
         where: { id },
         select: defaultPostSelect,
       });
@@ -102,15 +102,23 @@ export const postRouter = t.router({
   add: t.procedure
     .input(
       z.object({
-        id: z.string().uuid().optional(),
         title: z.string().min(1).max(32),
         slug: z.string().min(1).max(20),
         content: z.string().min(1),
       })
     )
-    .mutation(async ({ input }) => {
-      const post = await client.post.create({
-        data: input,
+    .mutation(async ({ input, ctx }) => {
+      const post = await ctx.prisma.post.create({
+        data: {
+          title: input.title,
+          slug: input.slug,
+          content: input.content,
+          author: {
+            connect: {
+              email: ctx.session?.user?.email as string,
+            },
+          },
+        },
         select: defaultPostSelect,
       });
       return post;

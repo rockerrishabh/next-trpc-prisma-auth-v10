@@ -4,6 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { Fragment } from "react";
 import { trpc } from "../utils/trpc";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 
 type FormData = {
   title: string;
@@ -17,6 +18,7 @@ const Home: NextPage = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormData>();
 
@@ -26,11 +28,16 @@ const Home: NextPage = () => {
     async onSuccess() {
       // refetches posts after a post is added
       await utils.post.list.invalidate();
+      reset();
     },
   });
 
   const onSubmit = handleSubmit(async (data) => {
-    addPost.mutateAsync(data);
+    toast.promise(addPost.mutateAsync(data), {
+      loading: "Saving...",
+      success: <b>Post saved!</b>,
+      error: <b>Could not save.</b>,
+    });
   });
 
   return (
