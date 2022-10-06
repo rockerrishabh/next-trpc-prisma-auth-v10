@@ -88,7 +88,12 @@ const Home: NextPage = () => {
                   className="outline-none rounded border border-gray-400"
                 />
               </section>
-              <button type="submit">Submit</button>
+              <button
+                className="rounded bg-green-500/90 text-white hover:bg-green-500/80 py-2 px-4"
+                type="submit"
+              >
+                Submit
+              </button>
             </form>
             <button
               className="rounded bg-red-500/90 text-white hover:bg-red-500/80 py-2 px-4"
