@@ -4,7 +4,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { Fragment } from "react";
 import { trpc } from "../utils/trpc";
 import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 
 type FormData = {
   title: string;
@@ -45,6 +45,7 @@ const Home: NextPage = () => {
       title="Gaming Duniya"
       className="max-w-7xl space-y-3 flex bg-gray-200 flex-col mx-auto"
     >
+      <Toaster />
       <section>
         {session ? (
           <Fragment>
